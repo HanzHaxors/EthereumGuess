@@ -1,5 +1,7 @@
 from random import SystemRandom
 from eth_keys import keys
+from os import system as cmd
+import sys, threading, win10toast
 
 """
 LIBRARY
@@ -155,36 +157,89 @@ def mnemonic_to_private_key(mnemonic, str_derivation_path=LEDGER_ETH_DERIVATION_
 ## EthereumGuess
 ## (c) HanzHaxors 2020
 ######################################
+
+# Process argv
+argv = len(sys.argv) > 1
+if argv:
+	if sys.argv[1] == "-h" or sys.argv[1] == "-help" or sys.argv[1] == "--help":
+		print(f"""
+	EthereumGuess
+	~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	Usage:
+	py ethereumGuess.py [-h|-help|--help|-v]
+
+
+	Argument			Description
+	-h or -help or --help		Shows this message
+	-v				Verbose mode
+	""")
+		cmd("pause")
+		exit()
+
 try:
 	maxt = int(input("[#] Maximum try: "))
 except:
 	print("[!] Please input number only!")
 	exit()
 
+# basephrase = sys.argv[-2].split() if " " in sys.argv[-2] else input("[#] Base phrase: ").split()
+# expected = sys.argv[-1] if sys.argv[-1].startswith("0x") else input("[#] Expected address: ")
 basephrase = input("[#] Base phrase: ").split()
 expected = input("[#] Expected address: ")
+
 private_key = None
 addr = ""
 found = False
 rng = SystemRandom()
+res = set()
 
-def guess():
-	for _ in range(maxt):
+for _ in range(maxt): # TODO: Threading
+	nowlen = len(res)
+	
+	while nowlen == len(res):
 		rng.shuffle(basephrase)
-		private_key = mnemonic_to_private_key(" ".join(basephrase))
+		res.add(' '.join(basephrase))
+	
+	private_key = mnemonic_to_private_key(" ".join(basephrase))
 
-		priv_key = keys.PrivateKey(private_key)
-		pub_key = priv_key.public_key
-		addr = pub_key.to_checksum_address()
+	priv_key = keys.PrivateKey(private_key)
+	pub_key = priv_key.public_key
+	addr = pub_key.to_checksum_address()
 		
-		if addr == expected:
-			found = True
-			break
+	if argv:
+		if sys.argv[1] == "-v":
+			print(f"[i] Trying {' '.join(basephrase)}")
+			print(f"[i] Result: {addr}")
+	
+	print(f"[{_}] Trying...", end="\r")
+	
+	if addr == expected or found:
+		# found added here to stop other threads
+		# when one of them found the key (TODO)
+		found = True
+		print("\n")
+		break
 
-guess()
+# Threading
+# howmuch = int(input("[#] Thread number to use: "))
+# threads = list()
+# for i in range(howmuch):
+	# t = threading.Thread(target=guess, daemon=True)
+	# threads.append(t)
+
+# for thread in threads:
+	# thread.start()
+	# thread.join()
 
 if found:
+	print(f"""
+Key Found!
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~""")
 	print(f"[i] Private: {private_key.hex()}")
 	print(f"[i] Address: {addr}")
+	
+	win10toast.ToastNotifier().show_toast(title="Key Found!",msg=f"PrivateKey: {private_key.hex()}\nAddress: {addr}", threaded=True, duration=10)
 else:
 	print(f"[i] Not found after trying {str(maxt)} times")
+	win10toast.ToastNotifier().show_toast(title="Nothing Found...",msg=f"After trying {str(maxt)} times", threaded=True, duration=10)
+cmd("pause")
