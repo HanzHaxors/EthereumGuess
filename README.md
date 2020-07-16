@@ -5,4 +5,5 @@
 Guess Ethereum private key by using base seed phrase. (Supports unlimited tries!)
 
 # Usage
-`py ethereumGuess.py [-v|-h|-help|--help]`
+`pip3 install -r requirements.txt`
+`python3 ethereumGuess.py [-v|-h|-help|--help]`

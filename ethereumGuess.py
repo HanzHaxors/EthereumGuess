@@ -238,8 +238,15 @@ Key Found!
 	print(f"[i] Private: {private_key.hex()}")
 	print(f"[i] Address: {addr}")
 	
-	win10toast.ToastNotifier().show_toast(title="Key Found!",msg=f"PrivateKey: {private_key.hex()}\nAddress: {addr}", threaded=True, duration=10)
+	try:
+		win10toast.ToastNotifier().show_toast(title="Key Found!",msg=f"PrivateKey: {private_key.hex()}\nAddress: {addr}", threaded=True, duration=10)
+	except:
+		pass
 else:
 	print(f"[i] Not found after trying {str(maxt)} times")
-	win10toast.ToastNotifier().show_toast(title="Nothing Found...",msg=f"After trying {str(maxt)} times", threaded=True, duration=10)
+	
+	try:
+		win10toast.ToastNotifier().show_toast(title="Nothing Found...",msg=f"After trying {str(maxt)} times", threaded=True, duration=10)
+	except:
+		pass
 cmd("pause")
