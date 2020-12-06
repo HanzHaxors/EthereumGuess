@@ -4,6 +4,9 @@
 [![HitCount](http://hits.dwyl.com/HanzHaxors/EthereumGuess.svg)](#)<br/>
 Guess Ethereum private key by using base seed phrase. (Supports unlimited tries!)
 
+# ToDo
+ - [ ] User Interface (UPCOMING)
+
 # Usage
 `pip3 install -r requirements.txt`
 `python3 ethereumGuess.py [-v|-h|-help|--help]`
